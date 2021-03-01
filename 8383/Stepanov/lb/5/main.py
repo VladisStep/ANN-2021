@@ -1,5 +1,3 @@
-# import os
-# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 from keras.datasets import cifar10
 from keras.models import Model
 from keras.layers import Input, Convolution2D, MaxPooling2D, Dense, Dropout, Flatten
