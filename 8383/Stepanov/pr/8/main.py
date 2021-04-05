@@ -5,7 +5,9 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Convolution2D, MaxPooling2D, Dense, Dropout, Flatten
 from sklearn.utils import shuffle
 from tensorflow import keras
+import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 X, Y = file2.gen_data(size=1000, img_size=50)
 X, Y = shuffle(X, Y)
@@ -66,16 +68,21 @@ class CustomCallback(keras.callbacks.Callback):
         accuracy_list.append(logs['accuracy'])
         val_accuracy_list.append(logs['val_accuracy'])
 
+        ne_val_accuracy_list = []
+
+        for i in val_accuracy_list:
+            ne_val_accuracy_list.append(1-i);
+
+
         if epoch_list.count(epoch + 1) != 0:
+            data = {'val_accuracy': val_accuracy_list,
+                    '1 - val_accutacy': ne_val_accuracy_list}
             fig, ax = plt.subplots()
-            plt.plot(range(1, (epoch + 2)), accuracy_list)
-            plt.plot(range(1, (epoch + 2)), val_accuracy_list)
-            plt.title('Model accuracy')
-            plt.ylabel('Accuracy')
-            plt.xlabel('Epoch')
-            plt.legend(['Train', 'Test'], loc='upper left')
+            df = pd.DataFrame(data)
+            df.plot(kind='bar', stacked=True)
+            plt.savefig("plot_" + str(epoch + 1))
             plt.show()
-            fig.savefig("plot_" + str(epoch + 1))
+
 
 ###########################################################################
 
