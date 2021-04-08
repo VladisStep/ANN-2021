@@ -16,17 +16,17 @@ inp = Input(shape=(6,))
 # encoder
 dense_ecoder = Dense(64, activation='relu', name='dense_ecoder')(inp)
 dense_ecoder = Dense(32, activation='relu')(dense_ecoder)
-dense_ecoder = Dense(4, activation='relu')(dense_ecoder)
+dense_ecoder = Dense(4)(dense_ecoder)
 
 # regression
-dense_1 = Dense(4, activation='relu')(dense_ecoder)
+dense_1 = Dense(32, activation='relu')(dense_ecoder)
 dense_2 = Dense(64, activation='relu')(dense_1)
 out_reg = Dense(1, name='out_reg')(dense_2)
 
 # decoder
 dense_decoder = Dense(32, activation='relu', name='dense_decoder_1')(dense_ecoder)
 dense_decoder = Dense(64, activation='relu', name='dense_decoder_2')(dense_decoder)
-dense_decoder = Dense(6, activation='relu', name='dense_decoder_out')(dense_decoder)
+dense_decoder = Dense(6, name='dense_decoder_out')(dense_decoder)
 
 # configuration
 model = Model(inputs=inp, outputs=[out_reg, dense_decoder])
@@ -46,8 +46,12 @@ np.savetxt('outOfModels/data_reg_model.csv', np.hstack((test_targets, reg_pred))
 ecoder_model.save('models/reg_model.h5')
 
 # decoder model
-decoder = Model(inp, dense_decoder)
-decoder_pred = np.asarray(decoder.predict(test_data))
+decoder_input = Input(shape=(4,))
+decoder_dens = model.get_layer('dense_decoder_1')(decoder_input)
+decoder_dens = model.get_layer('dense_decoder_2')(decoder_dens)
+decoder_dens = model.get_layer('dense_decoder_out')(decoder_dens)
+decoder_model = Model(inputs=decoder_input, outputs=decoder_dens)
+decoder_pred = np.asarray(decoder_model.predict(encoder_pred))
 np.savetxt('outOfModels/data_decoder_model.csv', decoder_pred)
 ecoder_model.save('models/decoder_model.h5')
 
