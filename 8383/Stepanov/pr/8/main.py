@@ -65,19 +65,26 @@ except ValueError:
 class CustomCallback(keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
 
-        accuracy_list.append(logs['accuracy'])
-        val_accuracy_list.append(logs['val_accuracy'])
-
-        ne_val_accuracy_list = []
-
-        for i in val_accuracy_list:
-            ne_val_accuracy_list.append(1-i);
-
-
         if epoch_list.count(epoch + 1) != 0:
-            data = {'val_accuracy': val_accuracy_list,
-                    '1 - val_accutacy': ne_val_accuracy_list}
-            fig, ax = plt.subplots()
+
+            correctPredictions = [0, 0, 0]
+            wrongPredictions = [0, 0, 0]
+            predictions = model.predict(X)
+
+            for i in range(len(predictions)):
+                if (np.argmax(predictions[i]) == np.argmax(Y[i])):
+                    correctPredictions[np.argmax(Y[i])] += 1
+                else:
+                    wrongPredictions[np.argmax(Y[i])] += 1
+
+            # print("Correct:", correctPredictions)
+            # print("Wrong:", wrongPredictions)
+            # print("All:", np.sum(correctPredictions) + np.sum(wrongPredictions))
+            # print("In classes:", np.add(correctPredictions,  wrongPredictions))
+
+            data = {'Correct': correctPredictions,
+                    'Wrong': wrongPredictions}
+
             df = pd.DataFrame(data)
             df.plot(kind='bar', stacked=True)
             plt.savefig("plot_" + str(epoch + 1))
