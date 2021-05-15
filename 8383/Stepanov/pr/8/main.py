@@ -69,7 +69,9 @@ class CustomCallback(keras.callbacks.Callback):
 
             correctPredictions = [0, 0, 0]
             wrongPredictions = [0, 0, 0]
+            countsPredictions = [0, 0, 0]
             predictions = model.predict(X)
+
 
             for i in range(len(predictions)):
                 if (np.argmax(predictions[i]) == np.argmax(Y[i])):
@@ -77,10 +79,17 @@ class CustomCallback(keras.callbacks.Callback):
                 else:
                     wrongPredictions[np.argmax(Y[i])] += 1
 
+                countsPredictions[np.argmax(Y[i])] += 1
+
+
+
+            correctPredictions = np.divide(correctPredictions, countsPredictions)
+            wrongPredictions = np.divide(wrongPredictions, countsPredictions)
+
+            #
             # print("Correct:", correctPredictions)
             # print("Wrong:", wrongPredictions)
-            # print("All:", np.sum(correctPredictions) + np.sum(wrongPredictions))
-            # print("In classes:", np.add(correctPredictions,  wrongPredictions))
+            # print("count", countsPredictions)
 
             data = {'Correct': correctPredictions,
                     'Wrong': wrongPredictions}
